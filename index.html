@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThermoGuard | NTRO Monitoring</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="thermoguard.css">
+</head>
+
+<body class="dashboard">
+
+    <!-- ================= HEADER ================= -->
+    <header class="topbar">
+        <div class="brand">
+            <img src="logo.png" alt="ThermoGuard Logo" class="brand-logo">
+            <span class="brand-name">THERMOGUARD</span>
+            <span class="brand-sub">NTRO Monitoring</span>
+        </div>
+
+        <div class="sensor-status">
+            <span class="status-item">VIIRS: <strong>Active</strong></span>
+            <span class="status-item">MODIS: <strong>Synced 12m ago</strong></span>
+        </div>
+
+        <div class="metric-counters">
+            <div class="metric-card">
+                <span class="metric-label">Total Active Hotspots</span>
+                <span class="metric-value">1,248</span>
+            </div>
+            <div class="metric-card metric-alert">
+                <span class="metric-label">Industrial Alerts</span>
+                <span class="metric-value">6</span>
+            </div>
+            <div class="metric-card metric-persistent">
+                <span class="metric-label">Persistent Sources</span>
+                <span class="metric-value">42</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <span class="live-clock">Live: 10:42 UTC</span>
+            <button type="button" class="btn-export">Export Report</button>
+        </div>
+    </header>
+
+    <!-- ================= MAIN BODY ================= -->
+    <div class="dashboard-body">
+
+        <!-- ============ LEFT PANEL: LAYERS & FILTERS ============ -->
+        <aside class="panel panel-left">
+            <h2 class="panel-title">Layers & Filters</h2>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">Base Map</h3>
+                <label class="filter-option">
+                    <input type="radio" name="basemap" value="dark-matter" checked>
+                    Dark Matter
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="basemap" value="satellite-hybrid">
+                    Satellite Hybrid
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="basemap" value="standard-osm">
+                    Standard OSM
+                </label>
+            </section>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">Thermal Layer</h3>
+                <label class="filter-option">
+                    <input type="checkbox" name="layer-raw-firms" checked>
+                    Raw FIRMS Heatmap
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="layer-vector-markers" checked>
+                    Processed Vector Markers
+                </label>
+            </section>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">Infrastructure Layer</h3>
+                <label class="filter-option">
+                    <input type="checkbox" name="layer-osm-industrial" checked>
+                    OSM Industrial Boundaries
+                </label>
+            </section>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">Classification</h3>
+                <label class="filter-option">
+                    <input type="checkbox" name="class-accidental-fire" checked>
+                    Accidental Fire
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="class-gas-flare" checked>
+                    Controlled Gas Flare
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="class-mining">
+                    Mining Activity
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="class-agri-forest">
+                    Agricultural / Forest Fire
+                </label>
+            </section>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">Date Range</h3>
+                <select name="date-range" class="filter-select">
+                    <option value="today" selected>Today</option>
+                    <option value="6h">Last 6 Hours</option>
+                    <option value="24h">Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </section>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">Confidence</h3>
+                <label class="filter-slider-label" for="confidence-slider">Minimum Confidence: 80%</label>
+                <input type="range" id="confidence-slider" name="confidence" min="0" max="100" value="80">
+            </section>
+
+            <section class="filter-group">
+                <h3 class="filter-heading">FRP Threshold (MW)</h3>
+                <label class="filter-slider-label" for="frp-slider">Minimum FRP: 50 MW</label>
+                <input type="range" id="frp-slider" name="frp-threshold" min="0" max="500" value="50">
+            </section>
+        </aside>
+
+        <!-- ============ CENTER: MAIN MAP CANVAS ============ -->
+        <main class="panel panel-map">
+            <div id="map-canvas" class="map-canvas">
+                <!-- Map library (Leaflet/Mapbox) mounts here -->
+            </div>
+
+            <div class="map-legend">
+                <h3 class="legend-title">Legend</h3>
+                <ul class="legend-list">
+                    <li class="legend-item legend-critical">Critical Industrial Fire</li>
+                    <li class="legend-item legend-persistent">Persistent Industrial Source</li>
+                    <li class="legend-item legend-agri">Stubble / Agricultural Burning</li>
+                    <li class="legend-item legend-wildfire">Forest Fire / Wildfire</li>
+                </ul>
+            </div>
+        </main>
+
+        <!-- ============ RIGHT PANEL: INCIDENT FEED / INSPECTOR ============ -->
+        <aside class="panel panel-right">
+            <h2 class="panel-title">Live Alert Feed</h2>
+
+            <div class="incident-feed">
+
+                <article class="incident-card incident-critical">
+                    <header class="incident-header">
+                        <span class="incident-badge">Critical</span>
+                        <span class="incident-time">2 mins ago</span>
+                    </header>
+                    <h3 class="incident-facility">Jamnagar Refinery Complex</h3>
+                    <dl class="incident-metrics">
+                        <div class="incident-metric">
+                            <dt>FRP</dt>
+                            <dd>142 MW</dd>
+                        </div>
+                        <div class="incident-metric">
+                            <dt>Confidence</dt>
+                            <dd>96%</dd>
+                        </div>
+                    </dl>
+                </article>
+
+                <article class="incident-card incident-persistent">
+                    <header class="incident-header">
+                        <span class="incident-badge">Persistent Flare</span>
+                        <span class="incident-time">18 mins ago</span>
+                    </header>
+                    <h3 class="incident-facility">Tata Steel Plant</h3>
+                    <dl class="incident-metrics">
+                        <div class="incident-metric">
+                            <dt>FRP</dt>
+                            <dd>35 MW</dd>
+                        </div>
+                        <div class="incident-metric">
+                            <dt>Confidence</dt>
+                            <dd>89%</dd>
+                        </div>
+                    </dl>
+                </article>
+
+                <article class="incident-card incident-filtered">
+                    <header class="incident-header">
+                        <span class="incident-badge">Wildfire (Filtered)</span>
+                        <span class="incident-time">—</span>
+                    </header>
+                    <h3 class="incident-facility">Simlipal Forest</h3>
+                    <p class="incident-note">Filtered out by current classification settings.</p>
+                </article>
+
+            </div>
+
+            <!-- ============ SELECTED INCIDENT INSPECTOR ============ -->
+            <section class="incident-inspector" id="incident-inspector" hidden>
+                <h2 class="panel-title">Incident Details</h2>
+
+                <h3 class="inspector-facility">IOCL Panipat Refinery</h3>
+                <p class="inspector-verdict">AI Verdict: Critical Industrial Fire (Confidence: 94.2%)</p>
+
+                <dl class="inspector-metrics">
+                    <div class="inspector-metric">
+                        <dt>Brightness Temperature</dt>
+                        <dd>367 K</dd>
+                    </div>
+                    <div class="inspector-metric">
+                        <dt>Fire Radiative Power</dt>
+                        <dd>128 MW</dd>
+                    </div>
+                    <div class="inspector-metric">
+                        <dt>Acquisition Time</dt>
+                        <dd>10:38 UTC</dd>
+                    </div>
+                </dl>
+
+                <div class="inspector-chart" id="anomaly-history-chart">
+                    <!-- Sparkline chart mounts here -->
+                </div>
+            </section>
+        </aside>
+
+    </div>
+
+    <!-- ================= BOTTOM: TIME-SERIES PLAYBACK ================= -->
+    <footer class="playback-bar">
+        <div class="playback-controls">
+            <button type="button" class="btn-playback" id="btn-rewind">&laquo;</button>
+            <button type="button" class="btn-playback" id="btn-play">&#9654;</button>
+            <button type="button" class="btn-playback" id="btn-forward">&raquo;</button>
+        </div>
+
+        <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="0">
+
+        <div class="playback-range">
+            <span class="range-start">Jan 2026</span>
+            <span class="range-end">Present</span>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="thermoguard.js"></script>
+</body>
+
+</html>
