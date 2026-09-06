@@ -45,3 +45,57 @@ def industries(
         "count": len(data),
         "data": data
     }
+@app.get("/hotspot/nearby-industries")
+def hotspot_nearby_industries(
+    latitude: float,
+    longitude: float,
+    radius: int = 5000
+):
+    industries = get_nearby_industries(
+        latitude,
+        longitude,
+        radius
+    )
+
+    return {
+        "hotspot": {
+            "latitude": latitude,
+            "longitude": longitude
+        },
+        "radius_meters": radius,
+        "nearby_industries_count": len(industries),
+        "nearby_industries": industries
+    }
+@app.get("/analyze-hotspot")
+def analyze_hotspot(
+    area: str = "world",
+    days: int = 1,
+    radius: int = 500
+):
+    hotspots_data = get_hotspots(
+        area=area,
+        days=days
+    )
+
+    if not hotspots_data:
+        return {
+            "message": "No hotspots found"
+        }
+
+    hotspot = hotspots_data[0]
+
+    latitude = hotspot["latitude"]
+    longitude = hotspot["longitude"]
+
+    industries = get_nearby_industries(
+        latitude,
+        longitude,
+        radius
+    )
+
+    return {
+        "source": "NASA FIRMS + OpenStreetMap",
+        "hotspot": hotspot,
+        "nearby_industries_count": len(industries),
+        "nearby_industries": industries
+    }
