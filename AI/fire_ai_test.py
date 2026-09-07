@@ -4,7 +4,7 @@ from ultralytics import YOLO
 print("🔥 Fire AI Test Started")
 
 # Load AI model
-model = YOLO("best_nano_111.pt")
+model = YOLO("models/best_nano_111.pt")
 print("✅ Model loaded successfully")
 
 # Ask for image name

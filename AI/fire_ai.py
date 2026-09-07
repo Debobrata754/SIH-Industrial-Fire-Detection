@@ -1,4 +1,3 @@
-
 from ultralytics import YOLO
 import sys
 import cv2
@@ -7,7 +6,7 @@ import cv2
 # FIRE DETECTION AI MODEL
 # ==============================
 
-MODEL_PATH = "best_nano_111.pt"
+MODEL_PATH = "models/best_nano_111.pt"
 
 # Load trained Fire Detection model
 model = YOLO(MODEL_PATH)

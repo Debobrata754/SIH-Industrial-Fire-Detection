@@ -2,7 +2,7 @@ from ultralytics import YOLO
 
 print("1. Starting...")
 
-model = YOLO("best_nano_111.pt")
+model = YOLO("models/best_nano_111.pt")
 
 print("2. Model loaded")
 

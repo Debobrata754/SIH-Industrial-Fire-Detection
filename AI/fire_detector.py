@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO("best_nano_111.pt")
+model = YOLO("models/best_nano_111.pt")
 
 print("Fire Detection System Started!")
 
