@@ -14,9 +14,9 @@
     <!-- ================= HEADER ================= -->
     <header class="topbar">
         <div class="brand">
-            <img src="logo.png" alt="ThermoGuard Logo" class="brand-logo">
+            <span class="brand-logo"></span>
             <span class="brand-name">THERMOGUARD</span>
-            <span class="brand-sub">NTRO Monitoring</span>
+            <span class="brand-sub">NTRO MONITORING</span>
         </div>
 
         <div class="sensor-status">
@@ -45,11 +45,20 @@
         </div>
     </header>
 
+    <!-- ================= MOBILE TAB NAV ================= -->
+    <!-- Only visible on small screens; switches which panel is shown
+         since the three-column layout can't fit on a phone. -->
+    <nav class="mobile-tabs" aria-label="Dashboard sections">
+        <button type="button" class="mobile-tab" data-target="panel-left">Filters</button>
+        <button type="button" class="mobile-tab is-active" data-target="panel-map">Map</button>
+        <button type="button" class="mobile-tab" data-target="panel-right">Feed</button>
+    </nav>
+
     <!-- ================= MAIN BODY ================= -->
     <div class="dashboard-body">
 
         <!-- ============ LEFT PANEL: LAYERS & FILTERS ============ -->
-        <aside class="panel panel-left">
+        <aside class="panel panel-left" id="panel-left">
             <h2 class="panel-title">Layers & Filters</h2>
 
             <section class="filter-group">
@@ -99,11 +108,11 @@
                     Controlled Gas Flare
                 </label>
                 <label class="filter-option">
-                    <input type="checkbox" name="class-mining">
+                    <input type="checkbox" name="class-mining" checked>
                     Mining Activity
                 </label>
                 <label class="filter-option">
-                    <input type="checkbox" name="class-agri-forest">
+                    <input type="checkbox" name="class-agri-forest" checked>
                     Agricultural / Forest Fire
                 </label>
             </section>
@@ -133,7 +142,7 @@
         </aside>
 
         <!-- ============ CENTER: MAIN MAP CANVAS ============ -->
-        <main class="panel panel-map">
+        <main class="panel panel-map is-active-mobile" id="panel-map">
             <div id="map-canvas" class="map-canvas">
                 <!-- Map library (Leaflet/Mapbox) mounts here -->
             </div>
@@ -150,12 +159,12 @@
         </main>
 
         <!-- ============ RIGHT PANEL: INCIDENT FEED / INSPECTOR ============ -->
-        <aside class="panel panel-right">
+        <aside class="panel panel-right" id="panel-right">
             <h2 class="panel-title">Live Alert Feed</h2>
 
             <div class="incident-feed">
 
-                <article class="incident-card incident-critical">
+                <article class="incident-card incident-critical" data-classification="class-accidental-fire">
                     <header class="incident-header">
                         <span class="incident-badge">Critical</span>
                         <span class="incident-time">2 mins ago</span>
@@ -173,7 +182,7 @@
                     </dl>
                 </article>
 
-                <article class="incident-card incident-persistent">
+                <article class="incident-card incident-persistent" data-classification="class-gas-flare">
                     <header class="incident-header">
                         <span class="incident-badge">Persistent Flare</span>
                         <span class="incident-time">18 mins ago</span>
@@ -191,7 +200,7 @@
                     </dl>
                 </article>
 
-                <article class="incident-card incident-filtered">
+                <article class="incident-card incident-filtered" data-classification="class-agri-forest">
                     <header class="incident-header">
                         <span class="incident-badge">Wildfire (Filtered)</span>
                         <span class="incident-time">—</span>
@@ -235,15 +244,18 @@
     <!-- ================= BOTTOM: TIME-SERIES PLAYBACK ================= -->
     <footer class="playback-bar">
         <div class="playback-controls">
-            <button type="button" class="btn-playback" id="btn-rewind">&laquo;</button>
-            <button type="button" class="btn-playback" id="btn-play">&#9654;</button>
-            <button type="button" class="btn-playback" id="btn-forward">&raquo;</button>
+            <button type="button" class="btn-playback" id="btn-rewind" aria-label="Rewind 10 steps">&laquo;</button>
+            <button type="button" class="btn-playback" id="btn-play"
+                aria-label="Play historical timeline">&#9654;</button>
+            <button type="button" class="btn-playback" id="btn-forward" aria-label="Forward 10 steps">&raquo;</button>
         </div>
 
-        <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="0">
+        <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="0"
+            aria-label="Historical hotspot timeline scrubber">
 
         <div class="playback-range">
             <span class="range-start">Jan 2026</span>
+            <span class="range-current" id="playback-date-label">Jan 2026</span>
             <span class="range-end">Present</span>
         </div>
     </footer>

@@ -89,6 +89,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Leaflet needs to recalculate its size once the map's container
+    // is actually visible and at its final size — important now that
+    // the map panel can be hidden behind a mobile tab at load time.
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 200);
+
     /* ---------------------------------------------------------
        1. CONFIDENCE SLIDER — update label live
        --------------------------------------------------------- */
@@ -115,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const classificationCheckboxes = document.querySelectorAll(
         '.filter-group input[name^="class-"]'
     );
+    const incidentCardEls = document.querySelectorAll('.incident-card[data-classification]');
 
     classificationCheckboxes.forEach(function (checkbox) {
         checkbox.addEventListener('change', filterIncidents);
@@ -129,10 +137,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // For now this just logs — hook this up to real incident data
-        // (each incident-card would need a data-classification attribute
-        // to compare against activeClasses).
-        console.log('Active classification filters:', activeClasses);
+        // Actually hide/show each incident card based on its
+        // data-classification attribute, instead of just logging.
+        incidentCardEls.forEach(function (card) {
+            const cardClass = card.getAttribute('data-classification');
+            const shouldShow = activeClasses.indexOf(cardClass) !== -1;
+            card.classList.toggle('is-hidden', !shouldShow);
+        });
     }
 
     /* ---------------------------------------------------------
@@ -173,6 +184,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnPlay = document.getElementById('btn-play');
     const btnRewind = document.getElementById('btn-rewind');
     const btnForward = document.getElementById('btn-forward');
+    const playbackDateLabel = document.getElementById('playback-date-label');
+
+    // The scrubber represents the range from "Jan 2026" to "today".
+    // This maps its 0–100 value onto that many actual days, purely
+    // for the date readout — it doesn't (yet) fetch different data
+    // per date. Wire that in once you have a historical FIRMS feed.
+    const timelineStart = new Date(2026, 0, 1);
+    const timelineEnd = new Date();
+    const timelineDayCount = Math.max(
+        1,
+        Math.round((timelineEnd - timelineStart) / (1000 * 60 * 60 * 24))
+    );
+
+    function updatePlaybackLabel() {
+        const percent = parseInt(timelineSlider.value, 10) / parseInt(timelineSlider.max, 10);
+        const dayOffset = Math.round(percent * timelineDayCount);
+        const currentDate = new Date(timelineStart.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+        playbackDateLabel.textContent = currentDate.toLocaleDateString('en-US', {
+            month: 'short',
+            year: 'numeric'
+        });
+    }
 
     let isPlaying = false;
     let playInterval = null;
@@ -182,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (isPlaying) {
             btnPlay.innerHTML = '&#10074;&#10074;'; // pause icon
+            btnPlay.setAttribute('aria-label', 'Pause historical timeline');
             playInterval = setInterval(function () {
                 let value = parseInt(timelineSlider.value, 10);
                 if (value >= parseInt(timelineSlider.max, 10)) {
@@ -190,9 +224,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     value += 1;
                 }
                 timelineSlider.value = value;
+                updatePlaybackLabel();
             }, 200); // moves every 200ms — adjust speed here
         } else {
             btnPlay.innerHTML = '&#9654;'; // play icon
+            btnPlay.setAttribute('aria-label', 'Play historical timeline');
             clearInterval(playInterval);
         }
     });
@@ -200,13 +236,18 @@ document.addEventListener('DOMContentLoaded', function () {
     btnRewind.addEventListener('click', function () {
         let value = parseInt(timelineSlider.value, 10);
         timelineSlider.value = Math.max(0, value - 10);
+        updatePlaybackLabel();
     });
 
     btnForward.addEventListener('click', function () {
         let value = parseInt(timelineSlider.value, 10);
         const max = parseInt(timelineSlider.max, 10);
         timelineSlider.value = Math.min(max, value + 10);
+        updatePlaybackLabel();
     });
+
+    timelineSlider.addEventListener('input', updatePlaybackLabel);
+    updatePlaybackLabel();
 
     /* ---------------------------------------------------------
        7. EXPORT REPORT BUTTON
@@ -215,6 +256,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     exportButton.addEventListener('click', function () {
         alert('Export triggered — hook this up to your PDF/GeoJSON export logic.');
+    });
+
+    /* ---------------------------------------------------------
+       8. MOBILE TAB NAV — switch which panel is visible
+       --------------------------------------------------------- */
+    const mobileTabs = document.querySelectorAll('.mobile-tab');
+
+    mobileTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            const targetId = tab.getAttribute('data-target');
+
+            mobileTabs.forEach(function (t) {
+                t.classList.toggle('is-active', t === tab);
+            });
+
+            document.querySelectorAll('.dashboard-body > .panel').forEach(function (panel) {
+                panel.classList.toggle('is-active-mobile', panel.id === targetId);
+            });
+
+            // The map needs a nudge to redraw correctly the first time
+            // its container becomes visible again.
+            if (targetId === 'panel-map') {
+                setTimeout(function () {
+                    map.invalidateSize();
+                }, 50);
+            }
+        });
     });
 
 });
