@@ -1,4 +1,4 @@
-# AI_Thermal_Tracker — SIH Industrial Fire Detection
+# AI Thermal Tracker — SIH Industrial Fire Detection
 
 AI-powered geospatial platform that detects thermal hotspots via satellite data and classifies them as industrial fires, persistent industrial sources (gas flares), or natural fires (wildfire/agricultural burning) — built for **Smart India Hackathon 2026**.
 
@@ -9,7 +9,7 @@ AI-powered geospatial platform that detects thermal hotspots via satellite data 
 
 ## What it does
 
-Satellite-based fire monitoring tools like NASA FIRMS can tell you *that* something is hot — not *why*. ThermoGuard combines thermal anomaly data with land-infrastructure data to close that gap:
+Satellite-based fire monitoring tools like NASA FIRMS can tell you *that* something is hot — not *why*. AI Thermal Tracker combines thermal anomaly data with land-infrastructure data to close that gap:
 
 - Pulls real-time thermal hotspots from **NASA FIRMS** (VIIRS)
 - Cross-references each hotspot against **OpenStreetMap** industrial infrastructure data
@@ -84,12 +84,12 @@ Open `frontend/index.html` in a browser (or serve it with VS Code's Live Server 
 
 **Team Name:** IGNISIX
 
-Debobrata Paul(Lead)
-Akash Santra
-Aditya Das
-Aritra Bhattacharjee
-Anurag Sen
-Sonali Shaw
+- Debobrata Paul (Lead)
+- Akash Santra
+- Aditya Das
+- Aritra Bhattacharjee
+- Anurag Sen
+- Sonali Shaw
 
 ## References
 
