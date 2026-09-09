@@ -1,4 +1,4 @@
-# ThermoGuard — SIH Industrial Fire Detection
+# AI_Thermal_Tracker — SIH Industrial Fire Detection
 
 AI-powered geospatial platform that detects thermal hotspots via satellite data and classifies them as industrial fires, persistent industrial sources (gas flares), or natural fires (wildfire/agricultural burning) — built for **Smart India Hackathon 2026**.
 
@@ -84,7 +84,12 @@ Open `frontend/index.html` in a browser (or serve it with VS Code's Live Server 
 
 **Team Name:** IGNISIX
 
-*(add team member names here)*
+Debobrata Paul(Lead)
+Akash Santra
+Aditya Das
+Aritra Bhattacharjee
+Anurag Sen
+Sonali Shaw
 
 ## References
 
